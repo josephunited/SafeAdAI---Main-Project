@@ -1,0 +1,5 @@
+category,support,baseline_precision,baseline_recall,baseline_f1,candidate_b_precision,candidate_b_recall,candidate_b_f1,calibrated_oof_precision,calibrated_oof_recall,calibrated_oof_f1
+SAFE_FOR_ALL,75,0.4068,0.64,0.4974,0.4174,0.64,0.5053,0.4174,0.64,0.5053
+SAFE_14_PLUS,75,0.375,0.04,0.0723,0.375,0.04,0.0723,0.3158,0.08,0.1277
+SAFE_18_PLUS,34,0.18,0.2647,0.2143,0.2264,0.3529,0.2759,0.2381,0.2941,0.2632
+UNSAFE_FOR_ALL,10,0.1111,0.2,0.1429,0.1111,0.2,0.1429,0.1111,0.2,0.1429

@@ -1,0 +1,114 @@
+{
+  "model_configuration": "LogisticRegression(C=1.0, class_weight='balanced', max_iter=1000, random_state=42)",
+  "preprocessing": "StandardScaler (fitted strictly inside each fold)",
+  "cross_validation": "5-Fold Stratified Cross-Validation (deterministic seed=42)",
+  "per_fold_results": [
+    {
+      "fold": 1,
+      "val_accuracy": 0.4359,
+      "val_macro_f1": 0.3289
+    },
+    {
+      "fold": 2,
+      "val_accuracy": 0.4615,
+      "val_macro_f1": 0.3868
+    },
+    {
+      "fold": 3,
+      "val_accuracy": 0.359,
+      "val_macro_f1": 0.2993
+    },
+    {
+      "fold": 4,
+      "val_accuracy": 0.2564,
+      "val_macro_f1": 0.2159
+    },
+    {
+      "fold": 5,
+      "val_accuracy": 0.3947,
+      "val_macro_f1": 0.3649
+    }
+  ],
+  "out_of_fold_metrics": {
+    "model_name": "Logistic Regression (StandardScaler, Balanced)",
+    "total_samples": 194,
+    "accuracy": 0.3814,
+    "correct_count": 74,
+    "macro_precision": 0.3335,
+    "macro_recall": 0.3583,
+    "macro_f1": 0.3356,
+    "pfar": 0.8,
+    "pfar_count": 8,
+    "ugvr_18p": 0.3824,
+    "ugvr_count": 13,
+    "frr": 0.1267,
+    "frr_count": 19,
+    "abstention_count": 0,
+    "automated_coverage": 1.0,
+    "automated_accuracy": 0.3814,
+    "per_class": {
+      "SAFE_FOR_ALL": {
+        "precision": 0.3818,
+        "recall": 0.28,
+        "f1": 0.3231,
+        "support": 75,
+        "tp": 21,
+        "fp": 34,
+        "fn": 54
+      },
+      "SAFE_14_PLUS": {
+        "precision": 0.4857,
+        "recall": 0.4533,
+        "f1": 0.469,
+        "support": 75,
+        "tp": 34,
+        "fp": 36,
+        "fn": 41
+      },
+      "SAFE_18_PLUS": {
+        "precision": 0.3864,
+        "recall": 0.5,
+        "f1": 0.4359,
+        "support": 34,
+        "tp": 17,
+        "fp": 27,
+        "fn": 17
+      },
+      "UNSAFE_FOR_ALL": {
+        "precision": 0.08,
+        "recall": 0.2,
+        "f1": 0.1143,
+        "support": 10,
+        "tp": 2,
+        "fp": 23,
+        "fn": 8
+      }
+    },
+    "confusion_matrix": {
+      "SAFE_FOR_ALL": {
+        "SAFE_FOR_ALL": 21,
+        "SAFE_14_PLUS": 28,
+        "SAFE_18_PLUS": 14,
+        "UNSAFE_FOR_ALL": 12
+      },
+      "SAFE_14_PLUS": {
+        "SAFE_FOR_ALL": 24,
+        "SAFE_14_PLUS": 34,
+        "SAFE_18_PLUS": 10,
+        "UNSAFE_FOR_ALL": 7
+      },
+      "SAFE_18_PLUS": {
+        "SAFE_FOR_ALL": 8,
+        "SAFE_14_PLUS": 5,
+        "SAFE_18_PLUS": 17,
+        "UNSAFE_FOR_ALL": 4
+      },
+      "UNSAFE_FOR_ALL": {
+        "SAFE_FOR_ALL": 2,
+        "SAFE_14_PLUS": 3,
+        "SAFE_18_PLUS": 3,
+        "UNSAFE_FOR_ALL": 2
+      }
+    }
+  }
+}

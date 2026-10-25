@@ -1,3 +1,15 @@
+import os
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+try:
+    import torch
+    if hasattr(torch.backends, "mkldnn"):
+        torch.backends.mkldnn.enabled = False
+    torch.set_num_threads(1)
+except Exception:
+    pass
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.core.config import settings

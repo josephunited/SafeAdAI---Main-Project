@@ -1,0 +1,28 @@
+sample_id,failure_type,ground_truth,baseline_prediction,candidate_b_prediction,risk_score,violence_score,scam_score,deceptive_score,adult_score,visual_unsafe_flag,failure_analysis
+SAFEAD_S18P_IMG_001,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_14_PLUS,SAFE_14_PLUS,21.2,0.0,0.0,0.0,0.3028,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_IMG_007,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_FOR_ALL,SAFE_FOR_ALL,0.4,0.0,0.0,0.0,0.02,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_IMG_035,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_FOR_ALL,SAFE_FOR_ALL,1.31,0.0,0.0,0.0,0.0655,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_IMG_037,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_FOR_ALL,SAFE_FOR_ALL,0.79,0.0,0.0,0.0,0.0394,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_IMG_044,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_FOR_ALL,SAFE_FOR_ALL,13.15,0.0,0.0,0.0,0.02,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_IMG_062,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_FOR_ALL,SAFE_FOR_ALL,0.66,0.0,0.0,0.0,0.0331,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_IMG_067,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_FOR_ALL,SAFE_FOR_ALL,1.0,0.0,0.0,0.0,0.05,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_IMG_070,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_FOR_ALL,SAFE_FOR_ALL,1.15,0.0,0.0,0.0,0.0573,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_IMG_071,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_FOR_ALL,SAFE_FOR_ALL,1.0,0.0,0.0,0.0,0.05,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_VID_001,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_14_PLUS,SAFE_14_PLUS,8.26,0.2,0.0,0.0,0.213,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_VID_002,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_FOR_ALL,SAFE_FOR_ALL,4.44,0.1719,0.0,0.0,0.05,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_VID_005,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_14_PLUS,SAFE_14_PLUS,22.6,0.2,0.0,0.0,0.3229,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_VID_009,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_FOR_ALL,SAFE_FOR_ALL,5.0,0.2,0.0,0.0,0.05,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_VID_012,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_FOR_ALL,SAFE_FOR_ALL,5.0,0.2,0.0,0.0,0.05,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_VID_013,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_FOR_ALL,SAFE_FOR_ALL,5.0,0.2,0.0,0.0,0.05,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_VID_014,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_FOR_ALL,SAFE_FOR_ALL,5.0,0.2,0.0,0.0,0.05,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_S18P_VID_022,UNDERAGE_GATING_LEAK,SAFE_18_PLUS,SAFE_FOR_ALL,SAFE_FOR_ALL,5.0,0.2,0.0,0.0,0.05,False,Adult attire/beverage missed by visual adult detector
+SAFEAD_UFA_IMG_021,PROHIBITED_FALSE_ACCEPTANCE,UNSAFE_FOR_ALL,SAFE_18_PLUS,SAFE_18_PLUS,28.0,0.0,0.0,0.0,0.4,False,Undetected by baseline/Candidate B detectors; low modality risk score
+SAFEAD_UFA_IMG_026,PROHIBITED_FALSE_ACCEPTANCE,UNSAFE_FOR_ALL,SAFE_FOR_ALL,SAFE_FOR_ALL,0.4,0.0,0.0,0.0,0.02,False,Undetected by baseline/Candidate B detectors; low modality risk score
+SAFEAD_UFA_IMG_027,PROHIBITED_FALSE_ACCEPTANCE,UNSAFE_FOR_ALL,SAFE_FOR_ALL,SAFE_FOR_ALL,13.15,0.0,0.0,0.0,0.02,False,Undetected by baseline/Candidate B detectors; low modality risk score
+SAFEAD_UFA_IMG_034,PROHIBITED_FALSE_ACCEPTANCE,UNSAFE_FOR_ALL,SAFE_FOR_ALL,SAFE_FOR_ALL,0.4,0.0,0.0,0.0,0.02,False,Undetected by baseline/Candidate B detectors; low modality risk score
+SAFEAD_UFA_IMG_035,PROHIBITED_FALSE_ACCEPTANCE,UNSAFE_FOR_ALL,SAFE_FOR_ALL,SAFE_FOR_ALL,1.0,0.0,0.0,0.0,0.05,False,Undetected by baseline/Candidate B detectors; low modality risk score
+SAFEAD_UFA_IMG_054,PROHIBITED_FALSE_ACCEPTANCE,UNSAFE_FOR_ALL,SAFE_FOR_ALL,SAFE_FOR_ALL,0.4,0.0,0.0,0.0,0.02,False,Undetected by baseline/Candidate B detectors; low modality risk score
+SAFEAD_UFA_IMG_068,PROHIBITED_FALSE_ACCEPTANCE,UNSAFE_FOR_ALL,SAFE_18_PLUS,SAFE_18_PLUS,51.04,0.0,0.0,0.0,0.7291,False,Undetected by baseline/Candidate B detectors; low modality risk score
+SAFEAD_UFA_VID_001,PROHIBITED_FALSE_ACCEPTANCE,UNSAFE_FOR_ALL,UNSAFE_FOR_ALL,UNSAFE_FOR_ALL,90.0,0.9,0.0,0.0,0.75,True,Correctly rejected
+SAFEAD_UFA_VID_002,PROHIBITED_FALSE_ACCEPTANCE,UNSAFE_FOR_ALL,SAFE_18_PLUS,SAFE_18_PLUS,28.0,0.2,0.0,0.0,0.4,False,Undetected by baseline/Candidate B detectors; low modality risk score
+SAFEAD_UFA_VID_003,PROHIBITED_FALSE_ACCEPTANCE,UNSAFE_FOR_ALL,UNSAFE_FOR_ALL,UNSAFE_FOR_ALL,90.0,0.9,0.0,0.0,0.9847,True,Correctly rejected

@@ -1,10 +1,11 @@
 import os
+from typing import Optional
 import requests
 from backend.app.core.config import settings
 
 class AIClientService:
     @staticmethod
-    def process_advertisement(file_path: str, title: str = "", caption: str = "") -> dict:
+    def process_advertisement(file_path: str, title: str = "", caption: str = "", pipeline_mode: Optional[str] = "learned_rf") -> dict:
         """
         Executes AI inference either via local `ai.pipeline` or remote Colab endpoint.
         """
@@ -51,8 +52,18 @@ class AIClientService:
                 
         # 2. Local AI Pipeline Execution
         try:
-            from ai.pipeline import run_safead_inference
-            return run_safead_inference(file_path, title, caption)
+            try:
+                from ai.pipeline import run_safead_inference
+            except (ImportError, ModuleNotFoundError):
+                import sys
+                jb_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "joseph_safead_core", "backend2jb"))
+                if jb_dir not in sys.path:
+                    sys.path.insert(0, jb_dir)
+                try:
+                    from ai.pipeline import run_safead_inference
+                except (ImportError, ModuleNotFoundError):
+                    from backend2jb.ai.pipeline import run_safead_inference
+            return run_safead_inference(file_path, title, caption, pipeline_mode=pipeline_mode)
         except Exception as e:
             print(f"[AI Client ERROR] Local AI Pipeline execution error: {e}")
             return {

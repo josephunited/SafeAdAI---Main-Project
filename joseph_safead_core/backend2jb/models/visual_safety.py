@@ -95,6 +95,16 @@ class VisualSafetyDetector:
         print(f"[VisualSafetyDetector] Operating on visual safety heuristics.")
         return self
 
+    def unload_model(self):
+        """Releases PyTorch model and processor from RAM to prevent CPU memory exhaustion."""
+        import gc
+        self._model = None
+        self._processor = None
+        self._blip_model = None
+        self._blip_processor = None
+        self._is_loaded = False
+        gc.collect()
+
     def analyze_image(
         self,
         image_input: Union[str, Image.Image, np.ndarray]
@@ -249,11 +259,18 @@ class VisualSafetyDetector:
         confidences = [r.get("confidence", 0.0) for r in frame_results]
         avg_conf = float(np.mean(confidences)) if confidences else 0.0
 
+        # Prioritize scenes from frames that actually triggered safety violations first
+        violating_descs = [r.get("visual_description", "") for r in frame_results if r.get("unsafe") and r.get("visual_description")]
+        benign_descs = [r.get("visual_description", "") for r in frame_results if not r.get("unsafe") and r.get("visual_description")]
+        ordered_descs = list(dict.fromkeys(violating_descs + benign_descs))
+        scene_summary = "; ".join(ordered_descs[:3]) if ordered_descs else ""
+
         return {
             "category": list(all_detected)[0] if all_detected else "general_visual",
             "unsafe": any_unsafe,
             "confidence": round(avg_conf, 4),
             "source": "llama_guard_vision",
             "detected_categories": list(all_detected),
+            "visual_description": scene_summary,
             "frames_analyzed": len(frames)
         }

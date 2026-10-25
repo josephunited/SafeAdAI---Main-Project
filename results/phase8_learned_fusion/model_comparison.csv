@@ -1,0 +1,5 @@
+model_architecture,accuracy,macro_f1,sfa_recall,s14p_recall,s18p_recall,ufa_recall,pfar,ugvr_18p,frr,abstention_rate,automated_coverage,automated_accuracy
+Candidate B (Enhanced Alcohol),33.51%,0.2491,64.00%,4.00%,35.29%,20.00%,80.00%,50.00%,7.33%,0.00%,100.00%,33.51%
+"Logistic Regression (StandardScaler, Balanced)",38.14%,0.3356,28.00%,45.33%,50.00%,20.00%,80.00%,38.24%,12.67%,0.00%,100.00%,38.14%
+"Random Forest (max_depth=4, Balanced)",44.33%,0.4110,44.00%,41.33%,52.94%,40.00%,60.00%,32.35%,6.00%,0.00%,100.00%,44.33%
+Random Forest + Policy-First HITL,31.96%,0.3478,38.67%,18.67%,44.12%,40.00%,40.00%,17.65%,6.00%,25.26%,74.74%,42.76%

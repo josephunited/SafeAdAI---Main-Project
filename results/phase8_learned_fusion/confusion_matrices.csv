@@ -1,0 +1,21 @@
+model,true_class,SAFE_FOR_ALL,SAFE_14_PLUS,SAFE_18_PLUS,UNSAFE_FOR_ALL,REQUIRES_HUMAN_REVIEW
+Baseline (Frozen Heuristic),SAFE_FOR_ALL,48,2,18,7,0
+Baseline (Frozen Heuristic),SAFE_14_PLUS,48,3,20,4,0
+Baseline (Frozen Heuristic),SAFE_18_PLUS,17,3,9,5,0
+Baseline (Frozen Heuristic),UNSAFE_FOR_ALL,5,0,3,2,0
+Candidate B (Enhanced Alcohol),SAFE_FOR_ALL,48,2,18,7,0
+Candidate B (Enhanced Alcohol),SAFE_14_PLUS,48,3,20,4,0
+Candidate B (Enhanced Alcohol),SAFE_18_PLUS,14,3,12,5,0
+Candidate B (Enhanced Alcohol),UNSAFE_FOR_ALL,5,0,3,2,0
+Logistic Regression (5-Fold CV),SAFE_FOR_ALL,21,28,14,12,0
+Logistic Regression (5-Fold CV),SAFE_14_PLUS,24,34,10,7,0
+Logistic Regression (5-Fold CV),SAFE_18_PLUS,8,5,17,4,0
+Logistic Regression (5-Fold CV),UNSAFE_FOR_ALL,2,3,3,2,0
+Random Forest (5-Fold CV),SAFE_FOR_ALL,33,23,17,2,0
+Random Forest (5-Fold CV),SAFE_14_PLUS,25,31,12,7,0
+Random Forest (5-Fold CV),SAFE_18_PLUS,8,3,18,5,0
+Random Forest (5-Fold CV),UNSAFE_FOR_ALL,3,1,2,4,0
+Random Forest + Policy-First HITL,SAFE_FOR_ALL,29,11,15,2,18
+Random Forest + Policy-First HITL,SAFE_14_PLUS,22,14,11,7,21
+Random Forest + Policy-First HITL,SAFE_18_PLUS,5,1,15,5,8
+Random Forest + Policy-First HITL,UNSAFE_FOR_ALL,2,1,1,4,2

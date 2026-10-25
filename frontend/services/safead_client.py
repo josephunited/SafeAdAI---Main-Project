@@ -5,11 +5,11 @@ SAFEAD_API_URL = os.getenv("SAFEAD_API_URL", "http://localhost:8002/api/v1")
 
 class SafeAdClient:
     @staticmethod
-    def moderate_ad(file, title, caption):
+    def moderate_ad(file, title, caption, pipeline_mode: str = "learned_rf"):
         url = f"{SAFEAD_API_URL}/advertisements/check"
         try:
             files = {"file": (file.name, file.getvalue(), file.type)}
-            data = {"title": title, "caption": caption, "user_id": 1}
+            data = {"title": title, "caption": caption, "user_id": 1, "pipeline_mode": pipeline_mode}
             r = requests.post(url, files=files, data=data, timeout=600)
             if r.status_code == 200:
                 return r.json(), None

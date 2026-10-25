@@ -31,7 +31,7 @@ class SafeAdOCRService:
         # 1. Primary Engine: EasyOCR (PyTorch-native)
         try:
             import easyocr
-            self._easy_ocr_reader = easyocr.Reader(['en'], gpu=self.use_gpu, verbose=False)
+            self._easy_ocr_reader = easyocr.Reader(['en'], gpu=self.use_gpu, verbose=False, quantize=False)
             self._engine_type = "easyocr"
             print("[SafeAdOCRService] EasyOCR initialized successfully.")
             self._is_initialized = True
@@ -92,7 +92,7 @@ class SafeAdOCRService:
             }
 
         # Memory-safe image dimension clamp to prevent CPU OOM allocation in CRAFT detector
-        MAX_OCR_DIMENSION = 1280
+        MAX_OCR_DIMENSION = 960
         h, w = img_np.shape[:2]
         if max(h, w) > MAX_OCR_DIMENSION:
             scale = MAX_OCR_DIMENSION / float(max(h, w))
@@ -108,7 +108,7 @@ class SafeAdOCRService:
         # 1. EasyOCR Execution
         if self._engine_type == "easyocr" and self._easy_ocr_reader is not None:
             try:
-                results = self._easy_ocr_reader.readtext(img_np)
+                results = self._easy_ocr_reader.readtext(img_np, canvas_size=960, mag_ratio=1.0)
                 if results:
                     for res in results:
                         if len(res) >= 2:
@@ -208,7 +208,12 @@ class SafeAdOCRService:
         frame_text_list = []
         all_confidences = []
 
+        # Bound video OCR sampling to max 6 keyframes to avoid excessive CPU and memory thrashing
+        sample_indices = set(np.linspace(0, len(frames) - 1, 6, dtype=int).tolist()) if len(frames) > 6 else set(range(len(frames)))
+
         for idx, frame in enumerate(frames):
+            if idx not in sample_indices:
+                continue
             res = self.extract_from_image(frame)
             tx = res.get("ocr_text", "")
             conf = res.get("ocr_confidence", 0.0)

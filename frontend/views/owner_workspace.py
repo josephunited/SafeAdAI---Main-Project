@@ -131,6 +131,28 @@ def owner_dashboard():
             
             # PRIVACY REQUIREMENT: Do NOT render media player or image on Brand Owner page
             
+            # Moderation Pipeline Mode Configuration (Phase 8E Learned RF Integration)
+            st.markdown("#### ⚙️ Moderation Engine Configuration")
+            mode_options = [
+                "Learned Random Forest (Default Experimental)",
+                "Safety-Prioritized Moderation (Learned RF + HITL Uncertainty Gate)",
+                "Candidate B (Enhanced Alcohol Heuristic)",
+                "Production Baseline (Frozen Heuristic)",
+            ]
+            selected_mode_label = st.selectbox(
+                "Select Moderation Pipeline Mode",
+                mode_options,
+                index=0,
+                help="Learned Random Forest is the new Phase 8E default experimental fusion engine. Heuristic baseline and Candidate B remain accessible."
+            )
+            mode_map = {
+                "Learned Random Forest (Default Experimental)": "learned_rf",
+                "Safety-Prioritized Moderation (Learned RF + HITL Uncertainty Gate)": "learned_rf_hitl",
+                "Candidate B (Enhanced Alcohol Heuristic)": "candidate_b",
+                "Production Baseline (Frozen Heuristic)": "production",
+            }
+            active_pipeline_mode = mode_map.get(selected_mode_label, "learned_rf")
+            
             st.markdown("---")
             if st.button("🚀 ANALYZE ADVERTISEMENT", type="primary", use_container_width=True):
                 if not ad_title:
@@ -167,20 +189,40 @@ def owner_dashboard():
                                 ad_data = resp.json()
                                 st.session_state["current_ad_id"] = ad_data["id"]
                                 
-                                analyze_resp = requests.post(f"{BACKEND_URL}/advertisements/{ad_data['id']}/analyze", timeout=120)
+                                analyze_resp = requests.post(
+                                    f"{BACKEND_URL}/advertisements/{ad_data['id']}/analyze",
+                                    params={"pipeline_mode": active_pipeline_mode},
+                                    timeout=600
+                                )
                                 if analyze_resp.status_code == 200:
                                     report = analyze_resp.json()
                         except Exception as backend_err:
                             print(f"[Owner Workspace] Backend API call error: {backend_err}")
 
-                            
                     if not report:
                         if run_safead_inference:
-                            report = run_safead_inference(temp_path, ad_title, ad_caption)
-                            st.session_state["current_ad_id"] = report.get("ad_id", 101)
-                            st.session_state["last_temp_path"] = temp_path
-                            st.session_state["last_ad_title"] = ad_title
-                            st.session_state["last_ad_caption"] = ad_caption
+                            try:
+                                report = run_safead_inference(
+                                    temp_path,
+                                    ad_title,
+                                    ad_caption,
+                                    pipeline_mode=active_pipeline_mode
+                                )
+                                st.session_state["current_ad_id"] = report.get("ad_id", 101)
+                                st.session_state["last_temp_path"] = temp_path
+                                st.session_state["last_ad_title"] = ad_title
+                                st.session_state["last_ad_caption"] = ad_caption
+                            except Exception as infer_err:
+                                st.error(f"Inference processing error: {infer_err}")
+                                report = {
+                                    "classification": "REQUIRES_HUMAN_REVIEW",
+                                    "publication_action": "HUMAN_REVIEW",
+                                    "risk_score": 50.0,
+                                    "confidence": 0.5,
+                                    "explanation": f"Automated processing interrupted: {infer_err}. Routed to Human Review.",
+                                    "detected_categories": ["Processing Interrupted"],
+                                    "policy_stage": "Fail-Safe Human Review"
+                                }
                         else:
                             st.error("Inference module not found.")
                         
@@ -213,13 +255,24 @@ def owner_dashboard():
             else:
                 st.markdown("<div class='badge-approve'>SAFE FOR ALL — APPROVED</div>", unsafe_allow_html=True)
                 
-            # Metrics Row
+            # Engine Stage and Mode indicator
+            is_learned_rf = rep.get("pipeline_mode", "") in ["learned_rf", "learned_rf_hitl", "candidate_e", "candidate_e_hitl"] or "LEARNED" in str(rep.get("policy_stage", ""))
+            mode_badge = rep.get("pipeline_mode", "learned_rf").upper()
+            st.caption(f"🔧 **Moderation Engine**: `{mode_badge}` | **Policy Stage**: `{rep.get('policy_stage', 'Standard Fusion')}`")
+
+            # Metrics Row — Uncalibrated RF vote shares are explicitly labeled
             mcol1, mcol2, mcol3 = st.columns(3)
             mcol1.metric("Risk Score", f"{risk_score:.1f} / 100")
-            mcol2.metric("Confidence", f"{int(confidence * 100)}%")
+            if is_learned_rf:
+                mcol2.metric("RF Vote Share", f"{int(confidence * 100)}% (Uncalibrated)")
+            else:
+                mcol2.metric("Confidence", f"{int(confidence * 100)}%")
             mcol3.metric("Latency", f"{rep.get('total_processing_time_seconds', 0.0):.2f}s")
             
-            st.markdown(f"**Explanation**: {rep.get('explanation', '')}")
+            if is_learned_rf:
+                st.caption("ℹ️ *Note: Random Forest vote share represents tree ensemble consensus and is not a calibrated posterior probability.*")
+            
+            st.markdown(f"**Explanation**:\n\n{rep.get('explanation', '')}")
             
             # Central SafeAdAssessment Matrix Summary
             st.markdown("### 📊 Safety Evidence Summary")
@@ -243,12 +296,20 @@ def owner_dashboard():
             st.subheader("SECTION 3 — Choose Brand Owner Action")
             st.info("ℹ️ **Policy Enforcement**: The AI safety classification cannot be manually overridden by the Brand Owner.")
             
+            can_publish = classification not in ["UNSAFE_FOR_ALL", "REQUIRES_HUMAN_REVIEW"] and rep.get("publishable", True)
+            if not can_publish:
+                if classification == "UNSAFE_FOR_ALL":
+                    st.error("🚨 **Prohibited Content**: This advertisement was rejected and cannot be published to any user feed.")
+                elif classification == "REQUIRES_HUMAN_REVIEW" or not rep.get("publishable", True):
+                    st.warning("⏳ **Human Review Required**: Publication is withheld pending human moderator decision. Please send for review below.")
+
             b_act1, b_act2 = st.columns(2)
             b_act3, b_act4 = st.columns(2)
             
             with b_act1:
-                if st.button("✅ ACCEPT AI DECISION", use_container_width=True, type="primary"):
-                    if backend_online:
+                accept_type = "primary" if can_publish else "secondary"
+                if st.button("✅ ACCEPT AI DECISION", use_container_width=True, type=accept_type, disabled=not can_publish):
+                    if check_backend_online():
                         try:
                             requests.post(f"{BACKEND_URL}/advertisements/{ad_id}/accept-ai", timeout=5)
                         except Exception:
@@ -260,7 +321,7 @@ def owner_dashboard():
                     # Find if already added
                     ad_exists = any(a.get("ad_id") == ad_id for a in st.session_state["global_ads"])
                     
-                    if not ad_exists and classification != "UNSAFE_FOR_ALL":
+                    if not ad_exists and can_publish:
                         feed_ad = {
                             "ad_id": ad_id,
                             "classification": classification,
@@ -270,11 +331,7 @@ def owner_dashboard():
                         }
                         st.session_state["global_ads"].append(feed_ad)
 
-                    if classification == "UNSAFE_FOR_ALL":
-                        st.session_state["owner_action_msg"] = "🚨 Advertisement was classified as Unsafe for All and rejected."
-                    else:
-                        st.session_state["owner_action_msg"] = f"✅ Advertisement accepted and moved to the {classification} feed."
-                        
+                    st.session_state["owner_action_msg"] = f"✅ Advertisement accepted and moved to the {classification} feed."
                     st.session_state["moderation_report"] = None
                     st.session_state["current_ad_id"] = None
                     st.rerun()
@@ -291,8 +348,8 @@ def owner_dashboard():
                     st.rerun()
                     
             with b_act4:
-                if st.button("📥 SEND FOR HUMAN REVIEW", use_container_width=True):
-                    if backend_online:
+                if st.button("📥 SEND FOR HUMAN REVIEW", use_container_width=True, type="primary" if (not can_publish and classification == "REQUIRES_HUMAN_REVIEW") else "secondary"):
+                    if check_backend_online():
                         try:
                             requests.post(f"{BACKEND_URL}/advertisements/{ad_id}/human-review", json={"user_id": 1, "reason": "Brand owner requested review"}, timeout=5)
                         except Exception:
@@ -334,7 +391,7 @@ def owner_dashboard():
                         st.rerun()
                 with col_del2:
                     if st.button("🗑️ Confirm Delete", type="primary", use_container_width=True):
-                        if backend_online:
+                        if check_backend_online():
                             try:
                                 requests.delete(f"{BACKEND_URL}/advertisements/{ad_id}", timeout=5)
                             except Exception:

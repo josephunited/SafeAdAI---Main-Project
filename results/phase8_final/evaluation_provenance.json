@@ -1,0 +1,25 @@
+{
+  "phase": "Phase 8: Final Model Evaluation and Evidence Generation",
+  "timestamp": "2026-10-22T13:05:00Z",
+  "repository": "https://github.com/QuadRos-MBCET/main_project_s7",
+  "branch": "feature/phase-7b-dataset-v2-integration",
+  "commit_sha": "9b532a66f5918d9ec5c8f4636ae0c9cf22a56f97",
+  "dataset_repository": "https://github.com/QuadRos-MBCET/safead-dataset-hub",
+  "dataset_branch": "feature/dataset-improvement-reconstruction",
+  "dataset_commit": "0e8883856cad683dbeaf2c153660df25fa8c4c11",
+  "cohort_definition": "194 approved clean development samples from results/real_pipeline_baseline/saved_detector_outputs.json",
+  "sample_count": 194,
+  "held_out_samples_isolated": 88,
+  "synthetic_cards_quarantined": 118,
+  "scam_supplement_quarantined": 14,
+  "reproducibility": {
+    "baseline_accuracy": "62/194 (31.96%)",
+    "candidate_b_accuracy": "65/194 (33.51%)",
+    "changed_samples": [
+      "SAFEAD_S18P_IMG_002",
+      "SAFEAD_S18P_IMG_006",
+      "SAFEAD_S18P_IMG_031"
+    ],
+    "kfold_seed": 42
+  }
+}

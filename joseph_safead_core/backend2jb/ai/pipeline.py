@@ -43,7 +43,7 @@ from models.ad_risk_analyzer import AdRiskAnalyzer
 from models.fusion.safead_assessment import SafeAdAssessment
 from models.fusion.safead_fusion import SafeAdFusion
 
-from models.experimental_detectors import EnhancedAlcoholDetector, KineticViolenceDecoupler
+from models.experimental_detectors import EnhancedAlcoholDetector, KineticViolenceDecoupler, LearnedRFFusionClassifier
 
 # Singleton instances for lazy invocation
 visual_detector = VisualSafetyDetector()
@@ -58,6 +58,7 @@ fusion_engine = SafeAdFusion()
 # Experimental detector singletons (active ONLY when explicitly selected)
 experimental_alcohol_detector = EnhancedAlcoholDetector()
 experimental_violence_decoupler = KineticViolenceDecoupler()
+experimental_learned_rf = LearnedRFFusionClassifier()
 
 def run_safead_inference(
     file_path: str,
@@ -74,6 +75,8 @@ def run_safead_inference(
     - 'candidate_b' / 'experimental_alcohol': Baseline + EnhancedAlcoholDetector.
     - 'candidate_c' / 'experimental_violence': Baseline + Safeguarded KineticViolenceDecoupler.
     - 'candidate_d' / 'experimental_all': Baseline + Both Repaired Detectors.
+    - 'learned_rf' / 'candidate_e': Learned Random Forest fusion mode.
+    - 'learned_rf_hitl' / 'candidate_e_hitl': Learned Random Forest with Policy-First Uncertainty Routing.
     """
     start_total_time = time.time()
     stage_timings = {}
@@ -135,13 +138,19 @@ def run_safead_inference(
     # STEP 4: Visual Safety & Adult/NSFW Analysis (Llama Guard Vision & Falconsai ViT)
     step4_start = time.time()
     visual_res = visual_detector.analyze_video_frames(frames) if frames else {"unsafe": False, "confidence": 0.0, "detected_categories": []}
+    if hasattr(visual_detector, "unload_model"):
+        visual_detector.unload_model()
     nsfw_res = nsfw_detector.predict_video_frames(frames, ocr_text=ocr_text_combined) if frames else {"adult_score": 0.0, "adult_content_detected": False}
+    if hasattr(nsfw_detector, "unload_model"):
+        nsfw_detector.unload_model()
     model_manager.clear_gpu_memory()
     stage_timings["step4_visual_nsfw"] = round(time.time() - step4_start, 4)
 
     # STEP 5: Video Violence Analysis (VideoMAE)
     step5_start = time.time()
     violence_res = violence_detector.predict_video_frames(frames, ocr_text=ocr_text_combined, filename=filename_str, sampling_meta=sampling_meta) if (media_type == "video" and frames) else {"violence_score": 0.0, "violence_detected": False, "sampled_segments": []}
+    if hasattr(violence_detector, "unload_model"):
+        violence_detector.unload_model()
     model_manager.clear_gpu_memory()
     stage_timings["step5_violence"] = round(time.time() - step5_start, 4)
 
@@ -156,6 +165,8 @@ def run_safead_inference(
 
     if media_type == "video":
         audio_res = audio_service.process_video_audio(file_path, text_safety_detector=text_safety_detector)
+        if hasattr(audio_service, "unload_model"):
+            audio_service.unload_model()
         model_manager.clear_gpu_memory()
     stage_timings["step6_audio"] = round(time.time() - step6_start, 4)
 
@@ -174,7 +185,7 @@ def run_safead_inference(
 
     # Experimental Detector 1: EnhancedAlcoholDetector (Candidate B / D)
     alcohol_audit = None
-    if active_mode in ["candidate_b", "candidate_d", "experimental_alcohol", "experimental_all"]:
+    if active_mode in ["candidate_b", "candidate_d", "experimental_alcohol", "experimental_all", "learned_rf", "experimental_learned_rf", "candidate_e", "learned_rf_hitl", "candidate_e_hitl"]:
         alcohol_audit = experimental_alcohol_detector.evaluate_alcohol(
             ocr_text=ocr_text_combined,
             speech_transcript=audio_res.get("transcript", ""),
@@ -219,10 +230,11 @@ def run_safead_inference(
             "adult": nsfw_res.get("adult_score", 0.0),
             "child_safety": 1.0 if "Child Safety Risk" in visual_res.get("detected_categories", []) else 0.0,
             "unsafe": visual_res.get("unsafe", False),
-            "evidence": visual_res.get("detected_categories", [])
+            "evidence": visual_res.get("detected_categories", []),
+            "description": visual_res.get("visual_description", "")
         },
         video={
-            "violence": violence_res.get("violence_score", 0.0),
+            "violence": max(violence_res.get("violence_score", 0.0), 0.90 if "Violence" in visual_res.get("detected_categories", []) else 0.0),
             "adult": nsfw_res.get("adult_score", 0.0),
             "child_safety": 0.0,
             "sampled_segments": violence_res.get("sampled_segments", [])
@@ -281,6 +293,10 @@ def run_safead_inference(
             "detected_categories": ["Detector Ambiguity / Human Review Required"],
             "evidence": {"policy_reasons": hitl_reasons}
         }
+    elif active_mode in ["learned_rf", "experimental_learned_rf", "candidate_e"]:
+        fusion_output = experimental_learned_rf.evaluate(assessment, alcohol_audit=alcohol_audit, media_type=media_type, enable_policy_first=False)
+    elif active_mode in ["learned_rf_hitl", "candidate_e_hitl"]:
+        fusion_output = experimental_learned_rf.evaluate(assessment, alcohol_audit=alcohol_audit, media_type=media_type, enable_policy_first=True)
     else:
         fusion_output = fusion_engine.combine_assessment(assessment)
     stage_timings["step9_fusion"] = round(time.time() - step9_start, 4)
@@ -298,6 +314,11 @@ def run_safead_inference(
         "alcohol": alcohol_audit,
         "violence": violence_audit
     }
+
+    if "evidence" not in fusion_output or not fusion_output["evidence"]:
+        fusion_output["evidence"] = assessment.to_dict()
+    if "assessment_matrix" not in fusion_output or not fusion_output["assessment_matrix"]:
+        fusion_output["assessment_matrix"] = assessment.to_dict()
 
     model_manager.clear_gpu_memory()
 

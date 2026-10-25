@@ -65,6 +65,14 @@ class SafeAdViolenceDetector:
 
         return self
 
+    def unload_model(self):
+        """Releases PyTorch VideoMAE model from RAM to prevent CPU memory exhaustion."""
+        import gc
+        self._processor = None
+        self._model = None
+        self._is_loaded = False
+        gc.collect()
+
     VIOLENT_KEYWORDS = [
         "fight", "blood", "gun", "weapon", "knife", "kill", "dead", "stab",
         "attack", "assault", "shoot", "murder", "combat", "brawl", "punch",

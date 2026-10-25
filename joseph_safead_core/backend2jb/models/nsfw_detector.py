@@ -69,6 +69,13 @@ class SafeAdNSFWDetector:
 
         return self
 
+    def unload_model(self):
+        """Releases PyTorch ViT model from RAM to prevent CPU memory exhaustion."""
+        import gc
+        self._pipe = None
+        self._is_loaded = False
+        gc.collect()
+
     def _heuristic_skin_eval(self, pil_img: Image.Image) -> float:
         """
         Auxiliary skin-pixel chrominance filter using YCbCr & HSV color spaces.

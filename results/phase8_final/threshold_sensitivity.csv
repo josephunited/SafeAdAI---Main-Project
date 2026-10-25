@@ -1,0 +1,8 @@
+configuration_name,teen_risk_threshold,adult_threshold,prohibited_threshold,hitl_enabled,accuracy,macro_f1,pfar,ugvr_18p,frr,abstention_rate,automated_coverage,automated_accuracy
+Implemented Baseline Thresholds,25.0,0.35,50.0,False,0.3351,0.2491,0.8,0.5,0.0733,0.0,1.0,0.3351
+Candidate B Implemented,25.0,0.35,50.0,False,0.3351,0.2491,0.8,0.5,0.0733,0.0,1.0,0.3351
+"Lower Teen Threshold (r=20, a=0.35)",20.0,0.35,50.0,False,0.3351,0.2491,0.8,0.5,0.0733,0.0,1.0,0.3351
+"Higher Adult Threshold (r=25, a=0.40)",25.0,0.4,50.0,False,0.3402,0.2598,0.8,0.5588,0.0733,0.0,1.0,0.3402
+"Calibrated Compromise (r=20, a=0.40)",20.0,0.4,50.0,False,0.3402,0.2598,0.8,0.5588,0.0733,0.0,1.0,0.3402
+"Higher Teen Cutoff (r=30, a=0.35)",30.0,0.35,50.0,False,0.3351,0.2491,0.8,0.5,0.0733,0.0,1.0,0.3351
+Hybrid Architecture + HITL (Safety-First),25.0,0.35,50.0,True,0.2423,0.202,0.7,0.2647,0.0733,0.2216,0.7784,0.3113

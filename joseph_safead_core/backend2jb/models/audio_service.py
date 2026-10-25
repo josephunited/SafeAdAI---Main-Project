@@ -66,6 +66,14 @@ class SafeAdAudioService:
 
         return self
 
+    def unload_model(self):
+        """Releases Whisper speech model from RAM to prevent CPU memory exhaustion."""
+        import gc
+        self._whisper_model = None
+        self._pipe = None
+        self._is_loaded = False
+        gc.collect()
+
     def transcribe_wav(self, wav_path: str) -> Dict[str, Any]:
         """Transcribes a WAV audio file using Whisper."""
         if not wav_path or not os.path.exists(wav_path):

@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from pydantic import BaseModel
 import uvicorn
 import numpy as np
@@ -98,4 +98,4 @@ async def verify_id_and_face(
     return convert_types(res)
 
 if __name__ == "__main__":
-    uvicorn.run("face_age_api:app", host="0.0.0.0", port=8001, reload=True)
+    uvicorn.run("face_age_api:app", host="0.0.0.0", port=8001, reload=False)
